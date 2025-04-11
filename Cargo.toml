@@ -1,0 +1,24 @@
+[package]
+name = "blog"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Joe <joe.gloach@gmail.com>" ]
+
+[package.metadata.release]
+release = false
+
+# https://github.com/rustwasm/wasm-pack/issues/1247
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+axum  = { version = "0.8.3", default-features = false }
+axum-htmx = "0.7.0"
+worker = { version="0.5.0", features=["http", "axum"] }
+tower-service = "0.3.2"
+console_error_panic_hook = { version = "0.1.1" }
+maud = { version = "0.27.0", features = ["axum"] }
+iconify = "0.3.1"

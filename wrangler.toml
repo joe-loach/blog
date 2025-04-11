@@ -1,0 +1,11 @@
+name = "blog"
+main = "build/worker/shim.mjs"
+compatibility_date = "2025-04-11"
+
+[build]
+command = "worker-build --release"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
