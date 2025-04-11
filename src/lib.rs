@@ -24,8 +24,7 @@ fn router() -> Router {
                 },
             ),
         )
-        .route("/latest", get(|| async move { markup::latest::markup() }))
-        .layer(cors)
+        .route("/latest", get(|| async move { markup::latest::markup() }).layer(cors))
 }
 
 #[worker::event(fetch)]
