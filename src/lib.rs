@@ -1,9 +1,9 @@
 mod markup;
 
 use axum::{http, routing::get, Router};
-use axum_htmx::{HxBoosted, HxRequest, HX_BOOSTED, HX_REQUEST};
+use axum_htmx::{HxBoosted, HxRequest};
 use markup::page_layout;
-use tower_http::cors::{AllowOrigin, CorsLayer};
+use tower_http::cors::{self, AllowOrigin, CorsLayer};
 use tower_service::Service as _;
 
 fn router() -> Router {
@@ -12,8 +12,8 @@ fn router() -> Router {
             // Allow any subdomain from the base
             origin.as_bytes().ends_with(b"joeloach.co.uk")
         }))
-        // Allow htmx headers
-        .allow_headers([HX_REQUEST, HX_BOOSTED]);
+        // Allow ALL headers to pass through
+        .allow_headers(cors::Any);
 
     Router::new()
         .route(
