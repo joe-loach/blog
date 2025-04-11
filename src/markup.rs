@@ -23,9 +23,9 @@ pub fn page_layout(title: Option<&str>, content: Markup, partial: bool) -> Marku
 
     html! {
         (head(title))
-        body class="mx-auto flex min-h-screen max-w-3xl flex-col px-8" {
+        body class="blog:mx-auto blog:flex blog:min-h-screen blog:max-w-3xl blog:flex-col blog:px-8" {
             (header())
-            main .grow {
+            main ."blog:grow" {
                 div #content {
                     (content)
                 }
@@ -67,10 +67,10 @@ fn head(title: Option<&str>) -> Markup {
 
 fn header() -> Markup {
     html! {
-        header class="sticky top-0 z-40 bg-background/75 py-6 backdrop-blur-sm"{
-            nav class="flex items-center justify-between" {
+        header class="blog:sticky blog:top-0 blog:z-40 blog:bg-background/75 blog:py-6 blog:backdrop-blur-sm"{
+            nav class="blog:flex blog:items-center blog:justify-between" {
                 (nav_links())
-                div class="flex gap-0 sm:gap-4" {
+                div class="blog:flex blog:gap-0 blog:sm:gap-4" {
                     (theme_toggle())
                 }
             }
@@ -80,10 +80,10 @@ fn header() -> Markup {
 
 fn footer() -> Markup {
     html! {
-        footer class="flex flex-col items-center justify-center pb-16 sm:flex-row-reverse sm:justify-between" {
+        footer class="blog:flex blog:flex-col blog:items-center blog:justify-center blog:pb-16 blog:sm:flex-row-reverse blog:sm:justify-between" {
             div {}
-            p ."text-center" ."text-xs" ."text-muted-foreground" {
-                a ."hover:text-foreground" href="https://github.com/joe-loach/blog" { "Hand written html" } " by Joe Loach"
+            p ."blog:text-center" ."blog:text-xs" ."blog:text-muted-foreground" {
+                a ."blog:hover:text-foreground" href="https://github.com/joe-loach/blog" { "Hand written html" } " by Joe Loach"
             }
         }
     }
@@ -92,15 +92,15 @@ fn footer() -> Markup {
 fn theme_toggle() -> Markup {
     html! {
         button
-          class="cursor-pointer inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground h-9 w-9"
+          class="blog:cursor-pointer blog:inline-flex blog:items-center blog:justify-center blog:whitespace-nowrap blog:rounded-md blog:text-sm blog:font-medium blog:hover:bg-accent blog:hover:text-accent-foreground blog:h-9 blog:w-9"
           title="Toggle theme"
           aria-label="Toggle theme"
           onClick="toggleTheme()"
         {
-            div class="size-4 dark:hidden text-indigo-500" {
+            div class="blog:size-4 blog:dark:hidden blog:text-indigo-500" {
                 (PreEscaped(iconify::svg!("lucide:moon", width="16px", height="16px")))
             }
-            div class="size-4 hidden dark:block text-orange-300"{
+            div class="blog:size-4 blog:hidden blog:dark:block blog:text-orange-300"{
                 (PreEscaped(iconify::svg!("lucide:sun", width="16px", height="16px")))
             }
         }
@@ -110,14 +110,14 @@ fn theme_toggle() -> Markup {
 fn nav_links() -> Markup {
     let link = |name: &str, href: &str| -> Markup {
         html! {
-            li ."text-muted-foreground" ."hover:text-foreground" {
+            li ."blog:text-muted-foreground" ."blog:hover:text-foreground" {
                 a href=(href) { (name) }
             }
         }
     };
 
     html! {
-        ul hx-boost="true" hx-target="#content" hx-swap="innerHTML show:none" class="flex gap-4 sm:gap-8" {
+        ul hx-boost="true" hx-target="#content" hx-swap="innerHTML show:none" class="blog:flex blog:gap-4 blog:sm:gap-8" {
             (link("home", "/"))
             (link("portfolio", "https://joeloach.co.uk"))
         }

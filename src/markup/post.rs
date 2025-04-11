@@ -16,9 +16,9 @@ pub struct Post {
 pub fn link_item(post: &Post) -> Markup {
     html! {
         li {
-            h3 ."text-2xl" ."text-muted-foreground" { (post.date) }
-            a ."hover:underline decoration-2" hx-boost="true" hx-target="#content" hx-swap="innerHTML show:no-scroll" href=(post.page) {
-                h2 ."text-4xl" ."font-semibold" ."break-normal" { (post.title) }
+            h3 ."blog:text-2xl" ."blog:text-muted-foreground" { (post.date) }
+            a ."blog:hover:underline blog:decoration-2" hx-boost="true" hx-target="#content" hx-swap="innerHTML show:no-scroll" href=(post.page) {
+                h2 ."blog:text-4xl" ."blog:font-semibold" ."blog:break-normal" { (post.title) }
             }
         }
     }
