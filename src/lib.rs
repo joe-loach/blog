@@ -32,7 +32,7 @@ fn router() -> Router {
                 if hx {
                     html! {
                         // add stylesheet to head
-                        head hx-head="merge" {
+                        head hx-head="append" {
                             link rel="stylesheet" type="text/css" href="https://blog.joeloach.co.uk/tailwind.css";
                         }
                         (content)
