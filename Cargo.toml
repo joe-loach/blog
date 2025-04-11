@@ -19,6 +19,7 @@ axum  = { version = "0.8.3", default-features = false }
 axum-htmx = "0.7.0"
 worker = { version="0.5.0", features=["http", "axum"] }
 tower-service = "0.3.2"
+tower-http = { version = "0.6.2", features = ["cors"] }
 console_error_panic_hook = { version = "0.1.1" }
 maud = { version = "0.27.0", features = ["axum"] }
 iconify = "0.3.1"
