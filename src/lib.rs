@@ -3,6 +3,7 @@ mod markup;
 use axum::{http, routing::get, Router};
 use axum_htmx::{HxBoosted, HxRequest};
 use markup::page_layout;
+use maud::html;
 use tower_http::cors::{self, AllowOrigin, CorsLayer};
 use tower_service::Service as _;
 
@@ -24,7 +25,23 @@ fn router() -> Router {
                 },
             ),
         )
-        .route("/latest", get(|| async move { markup::latest::markup() }).layer(cors))
+        .route(
+            "/latest",
+            get(|HxRequest(hx): HxRequest| async move {
+                let content = markup::latest::markup();
+                if hx {
+                    html! {
+                        // add stylesheet to head
+                        head hx-head="merge" {
+                            link rel="stylesheet" type="text/css" href="https://blog.joeloach.co.uk/tailwind.css";
+                        }
+                        (content)
+                    }
+                } else {
+                    content
+                }
+            }).layer(cors),
+        )
 }
 
 #[worker::event(fetch)]
