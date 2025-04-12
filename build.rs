@@ -61,7 +61,7 @@ fn main() {
     let mut code = "#[allow(unused)] static ALL_POSTS: &[Post] = &[".to_owned();
     for (Meta { title, date }, file) in post_info {
         code.push_str(&format!(
-            "Post {{ date: \"{}\", title: \"{}\", page: \"{}\" }}",
+            "Post {{ date: \"{}\", title: \"{}\", page: \"{}\" }}, ",
             date,
             title,
             replace_prefix(file, ASSETS, "/").unwrap().display()
