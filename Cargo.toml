@@ -15,8 +15,9 @@ wasm-opt = false
 crate-type = ["cdylib"]
 
 [dependencies]
-axum  = { version = "0.8.3", default-features = false }
+axum = { version = "0.8.3", default-features = false, features = ["macros"] }
 axum-htmx = "0.7.0"
+axum-extra = { version = "0.10.1", default-features = false, features = ["typed-header"] }
 worker = { version="0.5.0", features=["http", "axum"] }
 tower-service = "0.3.2"
 tower-http = { version = "0.6.2", features = ["cors"] }
@@ -24,10 +25,7 @@ console_error_panic_hook = { version = "0.1.1" }
 maud = { version = "0.27.0", features = ["axum"] }
 iconify = "0.3.1"
 chrono = { version = "0.4.40", default-features = false, features = ["std"] }
-
-[build-dependencies]
-chrono = "0.4.40"
+include_dir = { version = "0.7.4", features= ["glob"] }
 pulldown-cmark = { version = "0.13.0" }
 matter = { version = "0.1.0-alpha4" }
 yaml-rust = "0.4"
-glob = "0.3.2"

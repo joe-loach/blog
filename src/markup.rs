@@ -1,19 +1,25 @@
 pub mod home;
-pub mod latest;
 pub mod post;
 
 use maud::{html, Markup, PreEscaped, Render, DOCTYPE};
 
-fn format_title(name: Option<&str>) -> String {
-    if let Some(name) = name {
-        format!("Joe's Blog - {}", name)
-    } else {
-        "Joe's Blog".to_owned()
+#[allow(unused)]
+pub enum Title<'a> {
+    Top,
+    Child(&'a str),
+    Blog(&'a str),
+}
+
+fn format_title(title: Title) -> String {
+    match title {
+        Title::Top => "Joe's Blog".to_owned(),
+        Title::Child(name) => format!("Joe's Blog - {}", name),
+        Title::Blog(name) => name.to_owned(),
     }
 }
 
 /// Page layout
-pub fn page_layout(title: Option<&str>, content: Markup, partial: bool) -> Markup {
+pub fn page_layout(title: Title, content: Markup, partial: bool) -> Markup {
     if partial {
         return html! {
             title { (format_title(title)) }
@@ -35,7 +41,7 @@ pub fn page_layout(title: Option<&str>, content: Markup, partial: bool) -> Marku
     }
 }
 
-fn head(title: Option<&str>) -> Markup {
+fn head(title: Title) -> Markup {
     html! {
         (DOCTYPE)
         head {
@@ -123,7 +129,6 @@ fn nav_links() -> Markup {
         }
     }
 }
-
 
 pub struct Javascript(&'static str);
 

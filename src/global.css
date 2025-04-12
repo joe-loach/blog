@@ -22,6 +22,47 @@
   --color-input: var(--input);
 }
 
+@layer components {
+  /* Apply custom styling to a blog post */
+  .post {
+    h1 {
+      @apply blog:text-3xl;
+    }
+    h2 {
+      @apply blog:text-2xl;
+    }
+    h3 {
+      @apply blog:text-xl;
+    }
+    ol {
+      @apply blog:list-decimal blog:list-inside;
+    }
+    ul {
+      @apply blog:list-disc blog:list-inside;
+    }
+    /* remove bullets on items with inputs */
+    li:has(> input)::marker {
+      content: '';
+      display: none;
+    }
+    a {
+      @apply blog:underline blog:text-muted-foreground blog:hover:text-foreground;
+    }
+    blockquote {
+      @apply blog:bg-accent blog:p-2 blog:rounded-md;
+    }
+    .footnote-definition {
+      @apply blog:flex blog:items-start blog:gap-2;
+      > sup {
+        @apply blog:shrink-0 blog:top-0 blog:leading-[1.5];
+      }
+      > p {
+        @apply blog:m-0 blog:text-sm blog:font-light
+      }
+    }
+  }
+}
+
 @layer utilities {
   .border {
     border-color: var(--color-border);
