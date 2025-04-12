@@ -43,11 +43,11 @@ pub struct PostFile {
 
 pub fn all() -> Markup {
     html! {
-        (post_body(&all_post_data(Order::Descending)))
+        (post_body(&all_post_data(Order::Descending), LinkStyle::Relative))
     }
 }
 
-pub fn latest() -> Markup {
+fn latest(link_style: LinkStyle) -> Markup {
     const LATEST_MAX_LEN: usize = 2;
 
     let mut posts = all_post_data(Order::Descending);
@@ -56,13 +56,19 @@ pub fn latest() -> Markup {
 
     html! {
         article class="blog:mt-8 blog:flex blog:flex-col blog:gap-16 blog:pb-16" {
-            (post_body(&latest))
+            (post_body(&latest, link_style))
         }
     }
 }
 
 async fn get_latest(origin: Option<TypedHeader<Origin>>) -> Markup {
-    add_style_if_cors(origin.is_some(), latest())
+    let link_style = if origin.is_some() {
+        LinkStyle::Absolute
+    } else {
+        LinkStyle::Relative
+    };
+
+    add_style_if_cors(origin.is_some(), latest(link_style))
 }
 
 async fn get_post_content(
@@ -142,12 +148,12 @@ fn all_post_data(order: Order) -> Vec<PostFile> {
     posts
 }
 
-fn post_body(posts: &[PostFile]) -> Markup {
+fn post_body(posts: &[PostFile], link_style: LinkStyle) -> Markup {
     html! {
         @if !posts.is_empty() {
             ul {
                 @for post in posts {
-                    (post.link())
+                    (post.link(link_style))
                 }
             }
         } @ else {
@@ -160,13 +166,19 @@ fn post_body(posts: &[PostFile]) -> Markup {
     }
 }
 
+#[derive(Clone, Copy)]
+enum LinkStyle {
+    Relative,
+    Absolute,
+}
+
 impl PostFile {
-    fn link(&self) -> Markup {
+    fn link(&self, style: LinkStyle) -> Markup {
         let human_date = self.meta.date.format("%Y-%m-%d").to_string();
         html! {
             li {
                 h3 ."blog:text-2xl" ."blog:text-muted-foreground" { (human_date) }
-                a ."blog:hover:underline blog:decoration-2" hx-boost="true" hx-target="#content" hx-swap="innerHTML show:no-scroll" href=(self.href()) {
+                a ."blog:hover:underline blog:decoration-2" hx-boost="true" hx-target="#content" hx-swap="innerHTML show:no-scroll" href=(self.href(style)) {
                     h2 ."blog:text-4xl" ."blog:font-semibold" ."blog:break-normal" { (self.meta.title) }
                 }
             }
@@ -174,9 +186,15 @@ impl PostFile {
     }
 
     /// `post`/`YYYY`/`MM`/`DD`/`title`
-    fn href(&self) -> String {
+    fn href(&self, style: LinkStyle) -> String {
         let href_date = self.meta.date.format("%Y/%m/%d").to_string();
 
-        format!("/post/{}/{}", href_date, self.path)
+        match style {
+            LinkStyle::Relative => format!("/post/{}/{}", href_date, self.path),
+            LinkStyle::Absolute => format!(
+                "https://blog.joeloach.co.uk/post/{}/{}",
+                href_date, self.path
+            ),
+        }
     }
 }
