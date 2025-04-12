@@ -51,7 +51,7 @@ fn head(title: Option<&str>) -> Markup {
             // link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png";
 
             // tailwind
-            link rel="stylesheet" type="text/css" href="tailwind.css";
+            link rel="stylesheet" type="text/css" href="/tailwind.css";
 
             // Page title
             title { (format_title(title)) }
