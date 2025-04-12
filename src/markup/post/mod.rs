@@ -61,13 +61,8 @@ pub fn latest() -> Markup {
     }
 }
 
-async fn get_latest(
-    HxRequest(hx): HxRequest,
-    HxBoosted(boosted): HxBoosted,
-    origin: Option<TypedHeader<Origin>>,
-) -> Markup {
-    let page = add_style_if_cors(origin.is_some(), latest());
-    page_layout(Title::Top, page, hx && boosted)
+async fn get_latest(origin: Option<TypedHeader<Origin>>) -> Markup {
+    add_style_if_cors(origin.is_some(), latest())
 }
 
 async fn get_post_content(
