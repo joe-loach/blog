@@ -41,12 +41,6 @@ pub struct PostFile {
     pub meta: MetaData,
 }
 
-pub fn all() -> Markup {
-    html! {
-        (post_body(&all_post_data(Order::Descending), LinkStyle::Relative))
-    }
-}
-
 fn latest(link_style: LinkStyle) -> Markup {
     const LATEST_MAX_LEN: usize = 2;
 
@@ -56,7 +50,7 @@ fn latest(link_style: LinkStyle) -> Markup {
 
     html! {
         article class="blog:mt-8 blog:flex blog:flex-col blog:gap-16 blog:pb-16" {
-            (post_body(&latest, link_style))
+            (post_list(&latest, link_style))
         }
     }
 }
@@ -112,13 +106,13 @@ async fn get_post_content(
 }
 
 #[allow(unused)]
-enum Order {
+pub enum Order {
     Ascending,
     Descending,
 }
 
 /// Retrives the data for all posts.
-fn all_post_data(order: Order) -> Vec<PostFile> {
+pub fn all_post_data(order: Order) -> Vec<PostFile> {
     let mut posts = Vec::new();
 
     for entry in POSTS.find("*.md").unwrap() {
@@ -148,7 +142,7 @@ fn all_post_data(order: Order) -> Vec<PostFile> {
     posts
 }
 
-fn post_body(posts: &[PostFile], link_style: LinkStyle) -> Markup {
+pub fn post_list(posts: &[PostFile], link_style: LinkStyle) -> Markup {
     html! {
         @if !posts.is_empty() {
             ul {
@@ -167,7 +161,7 @@ fn post_body(posts: &[PostFile], link_style: LinkStyle) -> Markup {
 }
 
 #[derive(Clone, Copy)]
-enum LinkStyle {
+pub enum LinkStyle {
     Relative,
     Absolute,
 }
