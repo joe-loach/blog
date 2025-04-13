@@ -53,7 +53,7 @@ impl BlogPostInfo {
 
     fn href(&self, style: LinkStyle) -> String {
         let location = encode_route(self.date, &self.title);
-        format!("{}/post/read/{}", style.base(), location)
+        format!("{}/post/{}", style.base(), location)
     }
 }
 
