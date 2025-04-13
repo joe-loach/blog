@@ -9,3 +9,7 @@ command = "worker-build --release"
 directory = "./public"
 binding = "ASSETS"
 html_handling = "auto-trailing-slash"
+
+[[r2_buckets]]
+bucket_name = "blog-posts"
+binding = "blog_posts"
