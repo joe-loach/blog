@@ -203,12 +203,6 @@ async fn get_post_content(
     Ok(page_layout(Title::Blog(&info.title), page, hx && boosted))
 }
 
-#[allow(unused)]
-pub enum Order {
-    Ascending,
-    Descending,
-}
-
 #[derive(Clone, Copy)]
 pub enum LinkStyle {
     Relative,

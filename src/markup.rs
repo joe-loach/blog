@@ -3,17 +3,14 @@ pub mod post;
 
 use maud::{html, Markup, PreEscaped, Render, DOCTYPE};
 
-#[allow(unused)]
 pub enum Title<'a> {
     Top,
-    Child(&'a str),
     Blog(&'a str),
 }
 
 fn format_title(title: Title) -> String {
     match title {
         Title::Top => "Joe's Blog".to_owned(),
-        Title::Child(name) => format!("Joe's Blog - {}", name),
         Title::Blog(name) => name.to_owned(),
     }
 }
