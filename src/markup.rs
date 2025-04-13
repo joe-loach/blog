@@ -3,6 +3,21 @@ pub mod post;
 
 use maud::{html, Markup, PreEscaped, Render, DOCTYPE};
 
+#[derive(Clone, Copy)]
+pub enum LinkStyle {
+    Relative,
+    Absolute,
+}
+
+impl LinkStyle {
+    pub fn base(&self) -> &str {
+        match self {
+            LinkStyle::Relative => "",
+            LinkStyle::Absolute => "https://blog.joeloach.co.uk",
+        }
+    }
+}
+
 pub enum Title<'a> {
     Top,
     Blog(&'a str),

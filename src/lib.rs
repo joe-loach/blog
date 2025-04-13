@@ -1,7 +1,7 @@
 mod markup;
 
 use axum::{http, routing::get, Extension, Router};
-use markup::{home, page_layout, post};
+use markup::{home, post};
 use tower_service::Service as _;
 use worker::{send::SendWrapper, Bucket};
 
