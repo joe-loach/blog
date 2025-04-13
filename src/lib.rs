@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod gen_post;
+
 mod markup;
 
 use axum::{http, routing::get, Extension, Router};

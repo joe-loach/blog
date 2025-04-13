@@ -1,9 +1,11 @@
 mod content;
+pub mod key;
 mod list;
 mod style;
 
 use axum::{routing::get, Router};
-use chrono::{Datelike, NaiveDate};
+use chrono::NaiveDate;
+use key::decode_key;
 use maud::{html, Markup};
 use tower_http::cors::{self, AllowOrigin, CorsLayer};
 use worker::Object;
@@ -33,14 +35,10 @@ pub struct BlogPostInfo {
 
 impl BlogPostInfo {
     pub fn from_object(obj: Object) -> Self {
-        let mut meta = obj
-            .custom_metadata()
-            .expect("every post object has metadata");
-        BlogPostInfo {
-            title: meta.remove("title").expect("has title"),
-            date: NaiveDate::parse_from_str(&meta.remove("date").expect("has date"), "%Y-%m-%d")
-                .expect("date is in YYYY-MM-DD format"),
-        }
+        let key = obj.key();
+        let (date, title) = decode_key(key);
+
+        BlogPostInfo { title, date }
     }
 
     fn link(&self, style: LinkStyle) -> Markup {
@@ -57,29 +55,6 @@ impl BlogPostInfo {
         let location = encode_route(self.date, &self.title);
         format!("{}/post/read/{}", style.base(), location)
     }
-}
-
-/// ASCD_DATE_NAME
-fn encode_key(date: NaiveDate, name: &str) -> String {
-    // convert the date into something lexicographically ascending
-    let year = 9999 - date.year();
-    let month = 99 - (date.month0() + 1);
-    let day = 99 - (date.day0() + 1);
-    let numbers = format!("{year}-{month}-{day}");
-
-    const NUMBER_TO_DIGIT_DIFFERENCE: u32 = 17;
-    let ascending_date = numbers
-        .chars()
-        .map(|c| {
-            if c.is_numeric() {
-                char::from_u32(c as u32 + NUMBER_TO_DIGIT_DIFFERENCE).unwrap()
-            } else {
-                c
-            }
-        })
-        .collect::<String>();
-
-    format!("{}_{}_{}", ascending_date, date.format("%Y-%m-%d"), name)
 }
 
 fn encode_route(date: NaiveDate, name: &str) -> String {

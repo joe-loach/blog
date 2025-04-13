@@ -9,7 +9,7 @@ use crate::{
     PostBucket,
 };
 
-use super::{encode_key, style::add_style_if_cors, BlogPostInfo};
+use super::{key::encode_key, style::add_style_if_cors, BlogPostInfo};
 
 #[worker::send]
 pub async fn get_blog_content(
