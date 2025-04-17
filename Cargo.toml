@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 authors = [ "Joe <joe.gloach@gmail.com>" ]
 
+[profile.release]
+lto = "fat"
+strip = true
+opt-level = "z"
+
 [package.metadata.release]
 release = false
 
