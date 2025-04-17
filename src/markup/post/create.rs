@@ -32,13 +32,12 @@ pub async fn create_new_post(
     pulldown_cmark::html::push_html(&mut html, parser);
 
     let key = encode_key(&meta.date, &meta.title);
-    let object_path = format!("blog-posts/{key}");
 
     let custom_meta_map = meta.into_hashmap();
 
     let object = bucket
         .0
-        .put(object_path, html)
+        .put(key, html)
         .custom_metadata(custom_meta_map)
         .execute()
         .await
