@@ -1,6 +1,3 @@
-#[cfg(test)]
-mod gen_post;
-
 mod markup;
 
 use axum::{http, routing::get, Extension, Router};
@@ -9,15 +6,20 @@ use tower_service::Service as _;
 use worker::{send::SendWrapper, Bucket};
 
 #[derive(Clone)]
+pub struct WorkerEnv(pub SendWrapper<worker::Env>);
+
+#[derive(Clone)]
 pub struct PostBucket(pub SendWrapper<Bucket>);
 
 fn router(env: worker::Env) -> Router {
-    let bucket = PostBucket(worker::send::SendWrapper::new(env.bucket("blog_posts").unwrap()));
+    let bucket = PostBucket(SendWrapper::new(env.bucket("blog_posts").unwrap()));
+    let env = WorkerEnv(SendWrapper::new(env));
 
     Router::new()
         .route("/", get(home::root))
         .nest("/post", post::router())
         .layer(Extension(bucket))
+        .layer(Extension(env))
 }
 
 #[worker::event(fetch)]

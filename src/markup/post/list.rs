@@ -4,12 +4,13 @@ use axum::{
     Extension,
 };
 use axum_extra::{headers::Origin, TypedHeader};
+use chrono::NaiveDate;
 use maud::{html, Markup};
 use serde::Deserialize;
 
 use crate::{
     markup::{
-        post::{style::add_style_if_cors, BlogPostInfo},
+        post::{style::add_style_if_cors, Metadata},
         LinkStyle,
     },
     PostBucket,
@@ -43,8 +44,9 @@ pub async fn get_all_paged(
     let posts = objects
         .objects()
         .into_iter()
-        .map(BlogPostInfo::from_object)
-        .collect::<Vec<_>>();
+        .map(Metadata::parse_from_object)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     if posts.is_empty() {
         return Ok(empty_list());
@@ -62,8 +64,8 @@ pub async fn get_all_paged(
     };
 
     let items = html! {
-        @for (idx, post) in posts.iter().enumerate() {
-            @let link = post.link(LinkStyle::Relative);
+        @for (idx, meta) in posts.iter().enumerate() {
+            @let link = link(meta, LinkStyle::Relative);
             @if is_last_post(idx) && objects.truncated() {
                 // let the last item ask for more if the list was truncated
                 li hx-get={(original_uri)(query)} hx-trigger="revealed" hx-swap="afterend" { (link) }
@@ -101,8 +103,9 @@ pub async fn get_latest(
     let posts = objects
         .objects()
         .into_iter()
-        .map(BlogPostInfo::from_object)
-        .collect::<Vec<_>>();
+        .map(Metadata::parse_from_object)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let cors = origin.is_some();
 
@@ -114,8 +117,8 @@ pub async fn get_latest(
     let content = if !posts.is_empty() {
         html! {
             ul {
-                @for post in posts{
-                    li { (post.link(style)) }
+                @for meta in posts {
+                    li { (link(&meta, style)) }
                 }
             }
         }
@@ -124,6 +127,25 @@ pub async fn get_latest(
     };
 
     Ok(add_style_if_cors(cors, content))
+}
+
+fn link(meta: &Metadata, style: LinkStyle) -> Markup {
+    fn href(meta: &Metadata, style: LinkStyle) -> String {
+        let location = encode_route(meta.date, &meta.title);
+        format!("{}/post/{}", style.base(), location)
+    }
+
+    let human_date = meta.date.format("%Y-%m-%d").to_string();
+    html! {
+        h3 ."blog:text-2xl" ."blog:text-muted-foreground" { (human_date) }
+        a ."blog:hover:underline blog:decoration-2" hx-boost="true" hx-target="#content" hx-swap="innerHTML show:no-scroll" href=(href(meta, style)) {
+            h2 ."blog:text-4xl" ."blog:font-semibold" ."blog:break-normal" { (meta.title) }
+        }
+    }
+}
+
+fn encode_route(date: NaiveDate, name: &str) -> String {
+    format!("{}/{}", date.format("%Y/%m/%d"), name)
 }
 
 fn empty_list() -> Markup {

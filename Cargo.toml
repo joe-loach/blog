@@ -28,11 +28,15 @@ tower-service = "0.3.2"
 tower-http = { version = "0.6.2", features = ["cors"] }
 console_error_panic_hook = { version = "0.1.1" }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 maud = { version = "0.27.0", features = ["axum"] }
 iconify = "0.3.1"
 chrono = { version = "0.4.40", default-features = false, features = ["std"] }
 # blog generation
-glob = "0.3.2"
 pulldown-cmark = { version = "0.13.0" }
 matter = { version = "0.1.0-alpha4" }
 yaml-rust = "0.4"
+
+[dev-dependencies]
+dotenvy = "0.15.7"
+glob = "0.3.2"

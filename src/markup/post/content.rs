@@ -9,7 +9,7 @@ use crate::{
     PostBucket,
 };
 
-use super::{key::encode_key, style::add_style_if_cors, BlogPostInfo};
+use super::{key::encode_key, style::add_style_if_cors, Metadata};
 
 #[worker::send]
 pub async fn get_blog_content(
@@ -21,7 +21,7 @@ pub async fn get_blog_content(
 ) -> Result<Markup, StatusCode> {
     // work out the key into the bucket
     let date = NaiveDate::from_ymd_opt(year as i32, month, day).ok_or(StatusCode::BAD_REQUEST)?;
-    let key = encode_key(date, &name);
+    let key = encode_key(&date, &name);
 
     let post = bucket
         .0
@@ -39,7 +39,7 @@ pub async fn get_blog_content(
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let info = BlogPostInfo::from_object(post);
+    let meta = Metadata::parse_from_object(post).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let page = add_style_if_cors(
         origin.is_some(),
@@ -51,5 +51,5 @@ pub async fn get_blog_content(
         },
     );
 
-    Ok(page_layout(Title::Blog(&info.title), page, hx && boosted))
+    Ok(page_layout(Title::Blog(&meta.title), page, hx && boosted))
 }

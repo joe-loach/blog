@@ -1,6 +1,8 @@
 ---
 title: Supported Markdown Syntax
 date: 2025-04-13
+tags:
+ - Markdown
 ---
 
 # Supported Markdown Syntax
