@@ -5,7 +5,11 @@ use chrono::NaiveDate;
 use maud::{html, Markup, PreEscaped};
 
 use crate::{
-    markup::{page_layout, Title},
+    markup::{
+        page_layout,
+        post::tag::{tags, Tag},
+        Title,
+    },
     models::Post,
     PostBucket, PostDB,
 };
@@ -42,7 +46,7 @@ pub async fn get_blog_content(
 
     let post_content = bucket
         .0
-        .get(post.meta.key)
+        .get(&post.meta.key)
         .execute()
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -56,19 +60,27 @@ pub async fn get_blog_content(
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let page = add_style_if_cors(
-        origin.is_some(),
-        html! {
-            // wrap the content in .post styling
-            .post {
-                (PreEscaped(contents))
-            }
-        },
-    );
+    let page = add_style_if_cors(origin.is_some(), blog_content(&post, &contents));
 
     Ok(page_layout(
         Title::Blog(&post.meta.title),
         page,
         hx && boosted,
     ))
+}
+
+fn blog_content(post: &Post, contents: &str) -> Markup {
+    html! {
+        // style the entire post
+        article .post {
+            h1 { (post.meta.title) }
+
+            @let post_tags = post.meta.tags.iter().cloned().map(Tag).collect::<Vec<_>>();
+            (tags(&post_tags))
+
+            section {
+                (PreEscaped(contents))
+            }
+        }
+    }
 }

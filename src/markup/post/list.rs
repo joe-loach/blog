@@ -5,7 +5,7 @@ use maud::{html, Markup};
 
 use crate::{
     markup::{
-        post::{style::add_style_if_cors, Metadata},
+        post::{style::add_style_if_cors, tag::tags, Metadata},
         LinkStyle,
     },
     models::Post,
@@ -95,6 +95,7 @@ fn link(meta: &Metadata, style: LinkStyle) -> Markup {
         a ."blog:hover:underline blog:decoration-2" hx-boost="true" hx-target="#content" hx-swap="innerHTML show:no-scroll" href=(href(meta, style)) {
             h2 ."blog:text-4xl" ."blog:font-semibold" ."blog:break-normal" { (meta.title) }
         }
+        (tags(&meta.tags))
     }
 }
 

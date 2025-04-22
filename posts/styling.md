@@ -5,8 +5,6 @@ tags:
  - Markdown
 ---
 
-# Supported Markdown Syntax
-
 ## Introduction {#intro}
 
 I generate my blog posts from markdown using `pulldown-cmark` server-side.
