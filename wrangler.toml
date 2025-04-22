@@ -13,3 +13,8 @@ html_handling = "auto-trailing-slash"
 [[r2_buckets]]
 bucket_name = "blog-posts"
 binding = "blog_posts"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "blog-post-meta"
+database_id = "4b45c8f1-af90-4b5a-a440-4d48b81e2203"

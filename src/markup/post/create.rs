@@ -1,17 +1,18 @@
 use axum::{http::StatusCode, Extension};
 use yaml_rust::YamlLoader;
 
-use crate::PostBucket;
+use crate::{models::Metadata as ModelMetadata, PostBucket, PostDB};
 
 use super::{
-    extract::{CreatePostSecret, CreatePostHeader},
-    key::encode_key,
+    extract::{CreatePostHeader, CreatePostSecret},
+    tag::Tag,
     Metadata,
 };
 
 #[worker::send]
-pub async fn create_new_post(
+pub async fn create_post(
     Extension(bucket): Extension<PostBucket>,
+    Extension(db): Extension<PostDB>,
     CreatePostHeader(provided_key): CreatePostHeader,
     CreatePostSecret(post_key_secret): CreatePostSecret,
     body: String,
@@ -31,17 +32,30 @@ pub async fn create_new_post(
     let mut html = String::new();
     pulldown_cmark::html::push_html(&mut html, parser);
 
-    let key = encode_key(&meta.date, &meta.title);
-
-    let custom_meta_map = meta.into_hashmap();
-
+    // put the blog content into the bucket
     let object = bucket
         .0
-        .put(key, html)
-        .custom_metadata(custom_meta_map)
+        .put(&meta.title, html)
         .execute()
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    // create the metadata
+    let meta = ModelMetadata {
+        title: meta.title,
+        date: meta.date.format(Metadata::DATE_FMT).to_string(),
+        key: object.key(),
+        tags: meta.tags.into_iter().map(|Tag(tag)| tag).collect(),
+    };
+    let meta_json = serde_json::to_string(&meta).expect("should serialize");
+
+    // add the metadata to the database
+    db.0.prepare("INSERT INTO posts (meta) VALUES (?)")
+        .bind(&[meta_json.into()])
+        .expect("valid sql")
+        .run()
+        .await
+        .expect("inserted post sucessfully");
 
     Ok(object.key())
 }

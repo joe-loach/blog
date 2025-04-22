@@ -1,111 +1,65 @@
-use axum::{
-    extract::{OriginalUri, Query},
-    http::StatusCode,
-    Extension,
-};
+use axum::{http::StatusCode, Extension};
 use axum_extra::{headers::Origin, TypedHeader};
 use chrono::NaiveDate;
 use maud::{html, Markup};
-use serde::Deserialize;
 
 use crate::{
     markup::{
         post::{style::add_style_if_cors, Metadata},
         LinkStyle,
     },
-    PostBucket,
+    models::Post,
+    PostDB,
 };
 
-#[derive(Deserialize)]
-pub struct Pagination {
-    // tells the list cursor where to continue from
-    token: Option<String>,
-}
-
 #[worker::send]
-pub async fn get_all_paged(
-    Query(Pagination { token }): Query<Pagination>,
-    Extension(bucket): Extension<PostBucket>,
-    OriginalUri(original_uri): OriginalUri,
-) -> Result<Markup, StatusCode> {
-    const POSTS_PER_PAGE_LIMIT: u32 = 10;
+pub async fn list_all(Extension(db): Extension<PostDB>) -> Result<Markup, StatusCode> {
+    let query =
+        // TODO: add pagination: LIMIT N OFFSET P;
+        db.0.prepare("SELECT meta FROM posts ORDER BY date DESC");
 
-    let mut list = bucket.0.list().limit(POSTS_PER_PAGE_LIMIT);
-
-    if let Some(token) = &token {
-        list = list.cursor(token);
-    }
-
-    let objects = list
-        .execute()
+    let posts = query
+        .all()
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .expect("query failed")
+        .results::<Post>()
+        .expect("failed to deserialize post meta");
 
-    let posts = objects
-        .objects()
-        .into_iter()
-        .map(Metadata::parse_from_object)
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let posts = posts.into_iter().map(Metadata::from).collect::<Vec<_>>();
 
     if posts.is_empty() {
         return Ok(empty_list());
     }
 
-    let is_last_post = {
-        let last = posts.len();
-        move |n: usize| n == (last - 1)
-    };
-
-    let query = if let Some(token) = &token {
-        format!("?token={}", token)
-    } else {
-        "".to_string()
-    };
-
     let items = html! {
-        @for (idx, meta) in posts.iter().enumerate() {
+        @for (_idx, meta) in posts.iter().enumerate() {
             @let link = link(meta, LinkStyle::Relative);
-            @if is_last_post(idx) && objects.truncated() {
-                // let the last item ask for more if the list was truncated
-                li hx-get={(original_uri)(query)} hx-trigger="revealed" hx-swap="afterend" { (link) }
-            } @ else {
-                li { (link) }
-            }
+            li { (link) }
         }
     };
 
-    // on the first request of the list (no pagination), return the list body
-    let needs_list_body = token.is_none();
     Ok(html! {
-        @if needs_list_body {
-            ul { (items) }
-        } @else {
-            (items)
-        }
+        ul { (items) }
     })
 }
 
 #[worker::send]
-pub async fn get_latest(
-    Extension(bucket): Extension<PostBucket>,
+pub async fn list_latest(
+    Extension(db): Extension<PostDB>,
     origin: Option<TypedHeader<Origin>>,
 ) -> Result<Markup, StatusCode> {
-    const LATEST_POST_COUNT: u32 = 2;
+    let query =
+        // TODO: add pagination: LIMIT N OFFSET P;
+        db.0.prepare("SELECT meta FROM posts ORDER BY date DESC LIMIT 2");
 
-    let list = bucket.0.list().limit(LATEST_POST_COUNT);
-
-    let objects = list
-        .execute()
+    let posts = query
+        .all()
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .expect("query failed")
+        .results::<Post>()
+        .expect("failed to deserialize post meta");
 
-    let posts = objects
-        .objects()
-        .into_iter()
-        .map(Metadata::parse_from_object)
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let posts = posts.into_iter().map(Metadata::from).collect::<Vec<_>>();
 
     let cors = origin.is_some();
 

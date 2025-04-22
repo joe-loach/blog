@@ -4,7 +4,6 @@ mod generate;
 mod content;
 mod create;
 mod extract;
-pub mod key;
 mod list;
 mod metadata;
 mod style;
@@ -27,9 +26,9 @@ pub fn router() -> Router {
         .allow_headers(cors::Any);
 
     Router::new()
-        .route("/list", get(list::get_all_paged))
-        .route("/latest", get(list::get_latest))
-        .route("/create", put(create::create_new_post))
+        .route("/list", get(list::list_all))
+        .route("/latest", get(list::list_latest))
+        .route("/create", put(create::create_post))
         .route("/{y}/{m}/{d}/{name}", get(content::get_blog_content))
         .layer(cors)
 }

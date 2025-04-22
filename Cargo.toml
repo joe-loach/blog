@@ -23,7 +23,7 @@ crate-type = ["cdylib"]
 axum = { version = "0.8.3", default-features = false, features = ["macros", "query"] }
 axum-htmx = "0.7.0"
 axum-extra = { version = "0.10.1", default-features = false, features = ["typed-header"] }
-worker = { version="0.5.0", features=["http", "axum"] }
+worker = { version="0.5.0", features=["http", "axum", "d1"] }
 tower-service = "0.3.2"
 tower-http = { version = "0.6.2", features = ["cors"] }
 console_error_panic_hook = { version = "0.1.1" }
