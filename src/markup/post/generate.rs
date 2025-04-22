@@ -20,8 +20,8 @@ fn generate_and_submit_posts() {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .args([
-                "http://localhost:8787/post/create",
-                // "https://blog.joeloach.co.uk/post/create",
+                // "http://localhost:8787/post/create",
+                "https://blog.joeloach.co.uk/post/create",
                 // method
                 "-X",
                 "PUT",
