@@ -2,17 +2,14 @@
 mod generate;
 
 mod content;
-mod create;
 mod extract;
 mod list;
+mod manager;
 mod metadata;
 mod style;
 mod tag;
 
-use axum::{
-    routing::{get, put},
-    Router,
-};
+use axum::{routing::get, Router};
 use metadata::Metadata;
 use tower_http::cors::{self, AllowOrigin, CorsLayer};
 
@@ -28,7 +25,7 @@ pub fn router() -> Router {
     Router::new()
         .route("/list", get(list::list_all))
         .route("/latest", get(list::list_latest))
-        .route("/create", put(create::create_post))
         .route("/{y}/{m}/{d}/{name}", get(content::get_blog_content))
+        .nest("/manage", manager::router())
         .layer(cors)
 }

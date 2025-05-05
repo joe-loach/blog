@@ -8,23 +8,23 @@ fn generate_and_submit_posts() {
     dotenv().expect("should be a `.env` file in project root");
 
     let auth_key = std::env::var("POST_AUTH_KEY_SECRET").expect("auth key exists");
-    let auth_header = format!("x-post-key: {}", auth_key);
+    let auth_header = format!("x-post-key: {auth_key}");
 
     for entry in glob("./posts/*.md").unwrap() {
         let entry = entry.expect("glob error :/");
 
         eprintln!("Generating: {}", entry.display());
 
-        // curl .../post/create -X PUT --header "X-Post-Key: test" --data-binary @-
+        // curl .../post/manage -X POST --header "X-Post-Key: test" --data-binary @-
         let mut child = std::process::Command::new("curl")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .args([
-                // "http://localhost:8787/post/create",
-                "https://blog.joeloach.co.uk/post/create",
+                // "http://localhost:8787/post/manage",
+                "https://blog.joeloach.co.uk/post/manage",
                 // method
                 "-X",
-                "PUT",
+                "POST",
                 // authorisation
                 "--header",
                 &auth_header,

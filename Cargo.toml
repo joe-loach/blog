@@ -20,7 +20,7 @@ wasm-opt = false
 crate-type = ["cdylib"]
 
 [dependencies]
-axum = { version = "0.8.3", default-features = false, features = ["macros", "query"] }
+axum = { version = "0.8.3", default-features = false, features = ["macros", "query", "json"] }
 axum-htmx = "0.7.0"
 axum-extra = { version = "0.10.1", default-features = false, features = ["typed-header"] }
 worker = { version="0.5.0", features=["http", "axum", "d1"] }
