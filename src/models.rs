@@ -9,8 +9,13 @@ pub struct Metadata {
     pub tags: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct PostId(pub usize);
+
 #[derive(Deserialize)]
 pub struct Post {
+    pub id: PostId,
     #[serde(deserialize_with = "from_json")]
     pub meta: Metadata,
 }

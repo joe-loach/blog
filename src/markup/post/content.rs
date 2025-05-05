@@ -29,7 +29,7 @@ pub async fn get_blog_content(
     let date = NaiveDate::from_ymd_opt(year as i32, month, day).ok_or(StatusCode::BAD_REQUEST)?;
 
     let query =
-        db.0.prepare("SELECT meta FROM posts WHERE title = ?1 AND date = ?2")
+        db.0.prepare("SELECT id, meta FROM posts WHERE title = ?1 AND date = ?2")
             .bind(&[
                 title.into(),
                 date.format(Metadata::DATE_FMT).to_string().into(),

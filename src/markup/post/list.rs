@@ -14,7 +14,7 @@ use crate::{
 
 #[worker::send]
 pub async fn list_all(Extension(db): Extension<PostDB>) -> Result<Markup, StatusCode> {
-    let query = db.0.prepare("SELECT meta FROM posts ORDER BY date DESC");
+    let query = db.0.prepare("SELECT id, meta FROM posts ORDER BY date DESC");
 
     let posts = query
         .all()
@@ -47,7 +47,7 @@ pub async fn list_latest(
     origin: Option<TypedHeader<Origin>>,
 ) -> Result<Markup, StatusCode> {
     let query =
-        db.0.prepare("SELECT meta FROM posts ORDER BY date DESC LIMIT 2");
+        db.0.prepare("SELECT id, meta FROM posts ORDER BY date DESC LIMIT 2");
 
     let posts = query
         .all()
